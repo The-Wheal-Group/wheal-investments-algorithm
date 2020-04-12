@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	sizeOfPopulation := 1000
+	sizeOfPopulation := 50
 	population := ga.NewPopulation(sizeOfPopulation)
 
 	for index := 0; index < 1000; index++ {
