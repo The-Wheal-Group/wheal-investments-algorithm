@@ -22,9 +22,11 @@ func (chromosome *Chromosome) CalculateFitness() float64 {
 
 	var fundsAllocation [3][3]float64
 
+	weightedAllocation := chromosome.GetAllocationPercentage()
+
 	for regionsIndex := 0; regionsIndex < 3; regionsIndex++ {
 		for fundsIndex := 0; fundsIndex < 3; fundsIndex++ {
-			fundsAllocation[regionsIndex][fundsIndex] = funds[regionsIndex][fundsIndex] * chromosome.Allocation[regionsIndex]
+			fundsAllocation[regionsIndex][fundsIndex] = funds[regionsIndex][fundsIndex] * weightedAllocation[regionsIndex]
 		}
 	}
 
@@ -88,36 +90,8 @@ func GenerateRandomChromosome() Chromosome {
 
 	var allocation [3]float64
 
-	allocationRemaining := 1.0
-
-	for index := 0; index < 2; index++ {
-		randomPercentage := random.Float64()
-		randomPercentage = math.Round(randomPercentage*100) / 100
-		randomFund := random.Intn(3 - index)
-
-		randomPercentage = math.Round((randomPercentage*allocationRemaining)*100) / 100
-
-		allocationRemaining -= randomPercentage
-
-		runningTotal := -1
-
-		for fundIndex := 0; fundIndex < 3; fundIndex++ {
-			if allocation[fundIndex] == 0 {
-				runningTotal++
-			}
-
-			if runningTotal == randomFund {
-				allocation[fundIndex] = randomPercentage
-				break
-			}
-		}
-	}
-
-	for fundIndex := 0; fundIndex < 3; fundIndex++ {
-		if allocation[fundIndex] == 0 {
-			allocation[fundIndex] = math.Round(allocationRemaining*100) / 100
-			break
-		}
+	for index := 0; index < 3; index++ {
+		allocation[index] = random.Float64()
 	}
 
 	chromosome := Chromosome{
@@ -125,4 +99,20 @@ func GenerateRandomChromosome() Chromosome {
 	}
 
 	return chromosome
+}
+
+func (chromosome *Chromosome) GetAllocationPercentage() Allocation {
+	var allocation Allocation
+
+	total := 0.0
+
+	for index := 0; index < 3; index++ {
+		total += chromosome.Allocation[index]
+	}
+
+	for index := 0; index < 3; index++ {
+		allocation[index] = chromosome.Allocation[index] / total
+	}
+
+	return allocation
 }

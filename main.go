@@ -8,10 +8,10 @@ import (
 )
 
 func main() {
-	sizeOfPopulation := 100
+	sizeOfPopulation := 1000
 	population := ga.NewPopulation(sizeOfPopulation)
 
-	for index := 0; index < 100; index++ {
+	for index := 0; index < 1000; index++ {
 		var newPopulation ga.Population
 		for len(newPopulation.Chromosomes) <= sizeOfPopulation {
 			chromosome := population.SelectRoulette()
@@ -37,5 +37,7 @@ func main() {
 		population = newPopulation
 	}
 
-	fmt.Println("Answer:", population.Fittest())
+	fittest := population.Fittest()
+
+	fmt.Println("Answer:", fittest.GetAllocationPercentage())
 }
