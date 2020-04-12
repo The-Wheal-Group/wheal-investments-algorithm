@@ -38,17 +38,18 @@ func (population *Population) CalculateFitness() {
 }
 
 func (population *Population) SelectRoulette() Chromosome {
+
 	randomSource := rand.NewSource(time.Now().UnixNano())
 	random := rand.New(randomSource)
 
 	targetRank := random.Float64() * population.TotalFitness
 
-	current := 0.0
+	current := targetRank
 
 	for _, chromosome := range population.Chromosomes {
-		current += chromosome.Fitness
+		current -= chromosome.Fitness
 
-		if current > targetRank {
+		if current < 0 {
 			return chromosome
 		}
 	}

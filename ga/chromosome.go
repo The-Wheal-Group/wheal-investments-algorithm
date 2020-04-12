@@ -76,8 +76,8 @@ func (chromosome *Chromosome) MutateSwap() {
 	randomSource := rand.NewSource(time.Now().UnixNano())
 	random := rand.New(randomSource)
 
-	fundToMutate := random.Intn(3)
-	fundToSwap := random.Intn(3)
+	fundToMutate := random.Intn(2)
+	fundToSwap := random.Intn(2)
 
 	temp := chromosome.Allocation[fundToMutate]
 	chromosome.Allocation[fundToMutate] = chromosome.Allocation[fundToSwap]
@@ -115,4 +115,15 @@ func (chromosome *Chromosome) GetAllocationPercentage() Allocation {
 	}
 
 	return allocation
+}
+
+func Crossover(parent1 Chromosome, parent2 Chromosome) Chromosome {
+	randomSource := rand.NewSource(time.Now().UnixNano())
+	random := rand.New(randomSource)
+
+	crossoverPoint := random.Intn(2)
+
+	parent1.Allocation[crossoverPoint] = parent2.Allocation[crossoverPoint]
+
+	return parent1
 }
