@@ -3,14 +3,15 @@ package main
 import (
 	"fmt"
 	"math"
+	"math/rand"
+	"time"
 )
 
 func main() {
-	allocation := [3]float64{0.0, 0.9, 0.1}
 
-	score := scoreAllocation(allocation)
+	fmt.Println(generateRandomAllocation())
 
-	fmt.Println(score)
+	//score := scoreAllocation(allocation)
 }
 
 func scoreAllocation(allocation [3]float64) float64 {
@@ -43,4 +44,45 @@ func scoreAllocation(allocation [3]float64) float64 {
 	}
 
 	return difference
+}
+
+func generateRandomAllocation() [3]float64 {
+	randomSource := rand.NewSource(time.Now().UnixNano())
+	random := rand.New(randomSource)
+
+	var allocation [3]float64
+
+	allocationRemaining := 1.0
+
+	for index := 0; index < 2; index++ {
+		randomPercentage := random.Float64()
+		randomPercentage = math.Round(randomPercentage*100) / 100
+		randomFund := random.Intn(3 - index)
+
+		randomPercentage = math.Round((randomPercentage*allocationRemaining)*100) / 100
+
+		allocationRemaining -= randomPercentage
+
+		runningTotal := -1
+
+		for fundIndex := 0; fundIndex < 3; fundIndex++ {
+			if allocation[fundIndex] == 0 {
+				runningTotal++
+			}
+
+			if runningTotal == randomFund {
+				allocation[fundIndex] = randomPercentage
+				break
+			}
+		}
+	}
+
+	for fundIndex := 0; fundIndex < 3; fundIndex++ {
+		if allocation[fundIndex] == 0 {
+			allocation[fundIndex] = math.Round(allocationRemaining*100) / 100
+			break
+		}
+	}
+
+	return allocation
 }
