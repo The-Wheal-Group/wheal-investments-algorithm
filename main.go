@@ -8,10 +8,12 @@ import (
 func main() {
 	allocation := [3]float64{0.0, 0.9, 0.1}
 
-	scoreAllocation(allocation)
+	score := scoreAllocation(allocation)
+
+	fmt.Println(score)
 }
 
-func scoreAllocation(allocation [3]float64) {
+func scoreAllocation(allocation [3]float64) float64 {
 	fund1 := [3]float64{20, 40, 60}
 	fund2 := [3]float64{30, 10, 60}
 	fund3 := [3]float64{60, 20, 20}
@@ -40,5 +42,5 @@ func scoreAllocation(allocation [3]float64) {
 		difference += math.Abs(desiredAllocation[index] - actualAllocation[index])
 	}
 
-	fmt.Println(difference)
+	return difference
 }
