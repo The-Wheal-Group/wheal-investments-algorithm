@@ -1,16 +1,24 @@
 package main
 
-import (
-	"fmt"
-)
-
 func main() {
-	fund1 := []int{20, 40, 60}
-	fund2 := []int{30, 10, 60}
+	//fund1 := [3]int{20, 40, 60}
+	//fund2 := [3]int{30, 10, 60}
+	desired := [3]int{30, 10, 60}
 
-	desired := []int{30, 10, 60}
+	allocation := [3]int{30, 20, 50}
 
-	fmt.Println(fund1)
-	fmt.Println(fund2)
-	fmt.Println(desired)
+	scoreAllocation(allocation, desired)
+}
+
+func scoreAllocation(allocation [3]int, desired [3]int) {
+
+	difference := 0
+
+	for index, value := range desired {
+		if value > allocation[index] {
+			difference += value - allocation[index]
+		} else {
+			difference += allocation[index] - value
+		}
+	}
 }
