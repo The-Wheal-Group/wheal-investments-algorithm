@@ -90,7 +90,9 @@ func main() {
 			fittestEverChromosome = fittest
 		}
 
-		fmt.Println(fittest.GetFundAllocationPercentage(), fittest.Fitness, "Generation:", generation)
+		//Print the fittest chromosome to the screen
+		generationText := fmt.Sprintf("Gen %04d:", generation)
+		fmt.Println(generationText, allocationText(fittest.GetFundAllocationPercentage()), fittest.Fitness)
 
 		//Set the new population as the population for the next generation
 		population = newPopulation
@@ -99,5 +101,14 @@ func main() {
 	//Get the fittest chromosome of the population
 	fittest := population.Fittest()
 
-	fmt.Println("Answer:", fittest.GetFundAllocationPercentage())
+	fmt.Println("Answer:", allocationText(fittest.GetFundAllocationPercentage()))
+}
+
+//Returns the allocation in human readable form
+func allocationText(fundAllocation ga.FundAllocation) string {
+	var allocationsText string
+	for _, value := range fundAllocation {
+		allocationsText += fmt.Sprintf("%.2f ", value)
+	}
+	return allocationsText
 }
