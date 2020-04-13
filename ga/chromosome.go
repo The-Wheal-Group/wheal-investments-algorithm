@@ -53,8 +53,11 @@ func (chromosome *Chromosome) CalculateFitness() float64 {
 
 	//Loop through all the parameters
 	for parameterIndex := 0; parameterIndex < len(desiredFundParameters); parameterIndex++ {
-		//Calculate the difference between the actual and desired parameters and make positivre
-		difference += math.Abs(desiredFundParameters[parameterIndex] - actualFundParameters[parameterIndex])
+		//Ignore if the desired parameter equals zero
+		if desiredFundParameters[parameterIndex] != 0 {
+			//Calculate the difference between the actual and desired parameters and make positive
+			difference += math.Abs(desiredFundParameters[parameterIndex] - actualFundParameters[parameterIndex])
+		}
 	}
 
 	//Avoid a divide by zero bug (i.e. fitness of infinity)
