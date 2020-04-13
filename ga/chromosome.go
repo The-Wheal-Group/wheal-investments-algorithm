@@ -6,7 +6,7 @@ import (
 )
 
 //The FundAllocation type
-type FundAllocation [6]float64
+type FundAllocation [11]float64
 
 //The Chromosome type
 type Chromosome struct {

@@ -119,7 +119,7 @@ func parametersText(fundParameters funds.FundParameters) string {
 func allocationText(fundAllocation ga.FundAllocation) string {
 	var allocationsText string
 	for _, value := range fundAllocation {
-		allocationsText += fmt.Sprintf("%.2f ", value)
+		allocationsText += fmt.Sprintf("%.2f ", value*100)
 	}
 	return allocationsText
 }
