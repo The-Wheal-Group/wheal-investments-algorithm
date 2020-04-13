@@ -1,18 +1,27 @@
 package funds
 
 //The Fund Parameters type
-type FundParameters [4]float64
+type FundParameters [6]float64
 
 //The FundsTable type
-type FundsTable [3]FundParameters
+type FundsTable [6]FundParameters
 
 func GetFunds() FundsTable {
-	fund1Parameters := FundParameters{20, 40, 60, 0}
-	fund2Parameters := FundParameters{30, 10, 60, 100}
-	fund3Parameters := FundParameters{60, 20, 20, 0}
-	return FundsTable{fund1Parameters, fund2Parameters, fund3Parameters}
+	fund1Parameters := FundParameters{100, 0, 0, 0, 0, 0}
+	fund2Parameters := FundParameters{0, 100, 0, 0, 0, 0}
+	fund3Parameters := FundParameters{0, 25, 75, 0, 0, 0}
+	fund4Parameters := FundParameters{0, 0, 0, 100, 0, 0}
+	fund5Parameters := FundParameters{0, 0, 0, 0, 100, 0}
+	fund6Parameters := FundParameters{0, 0, 0, 0, 0, 100}
+	return FundsTable{
+		fund1Parameters,
+		fund2Parameters,
+		fund3Parameters,
+		fund4Parameters,
+		fund5Parameters,
+		fund6Parameters}
 }
 
 func GetDesiredFundParameters() FundParameters {
-	return FundParameters{30, 10, 60, 0}
+	return FundParameters{30, 15, 10, 10, 10, 25}
 }

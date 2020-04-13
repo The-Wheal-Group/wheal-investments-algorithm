@@ -6,7 +6,7 @@ import (
 )
 
 //The FundAllocation type
-type FundAllocation [3]float64
+type FundAllocation [6]float64
 
 //The Chromosome type
 type Chromosome struct {
@@ -16,6 +16,35 @@ type Chromosome struct {
 
 //Calculate the fitness of a chromosome
 func (chromosome *Chromosome) CalculateFitness() float64 {
+	//Get the desired fund parameters
+	desiredFundParameters := funds.GetDesiredFundParameters()
+
+	//Get the actual fund parameters
+	actualFundParameters := chromosome.GetActualFundParameters()
+
+	//Store the difference between the actual and desired parameters
+	difference := 0.0
+
+	//Loop through all the parameters
+	for parameterIndex := 0; parameterIndex < len(desiredFundParameters); parameterIndex++ {
+		//Ignore if the desired parameter equals zero
+		if desiredFundParameters[parameterIndex] != 0 {
+			//Calculate the difference between the actual and desired parameters and make positive
+			difference += math.Abs(desiredFundParameters[parameterIndex] - actualFundParameters[parameterIndex])
+		}
+	}
+
+	//Avoid a divide by zero bug (i.e. fitness of infinity)
+	if difference == 0 {
+		difference = 0.00000001
+	}
+
+	//Return the fitness (the bigger the better)
+	return 1000000 / difference
+}
+
+//Get the actual fund parameters
+func (chromosome *Chromosome) GetActualFundParameters() funds.FundParameters {
 	//Get the funds table
 	fundsTable := funds.GetFunds()
 
@@ -48,25 +77,7 @@ func (chromosome *Chromosome) CalculateFitness() float64 {
 		}
 	}
 
-	//Store the difference between the actual and desired parameters
-	difference := 0.0
-
-	//Loop through all the parameters
-	for parameterIndex := 0; parameterIndex < len(desiredFundParameters); parameterIndex++ {
-		//Ignore if the desired parameter equals zero
-		if desiredFundParameters[parameterIndex] != 0 {
-			//Calculate the difference between the actual and desired parameters and make positive
-			difference += math.Abs(desiredFundParameters[parameterIndex] - actualFundParameters[parameterIndex])
-		}
-	}
-
-	//Avoid a divide by zero bug (i.e. fitness of infinity)
-	if difference == 0 {
-		difference = 0.00000001
-	}
-
-	//Return the fitness (the bigger the better)
-	return 100 / difference
+	return actualFundParameters
 }
 
 //Get the weighted fund allocation (won't add up to 100% without this function)

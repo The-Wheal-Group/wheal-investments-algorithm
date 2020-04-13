@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sort"
+	"wheal-investments-algorithm/funds"
 	"wheal-investments-algorithm/ga"
 )
 
@@ -93,7 +94,7 @@ func main() {
 
 		//Print the fittest chromosome to the screen
 		generationText := fmt.Sprintf("Gen %04d:", generation)
-		fmt.Println(generationText, allocationText(fittest.GetFundAllocationPercentage()), fittest.Fitness)
+		fmt.Println(generationText, parametersText(fittest.GetActualFundParameters()), fittest.Fitness)
 
 		//Set the new population as the population for the next generation
 		population = newPopulation
@@ -103,6 +104,15 @@ func main() {
 	fittest := population.Fittest()
 
 	fmt.Println("Answer:", allocationText(fittest.GetFundAllocationPercentage()))
+}
+
+//Returns the actual fund parameters in human readable form
+func parametersText(fundParameters funds.FundParameters) string {
+	var parametersText string
+	for _, value := range fundParameters {
+		parametersText += fmt.Sprintf("%.2f ", value)
+	}
+	return parametersText
 }
 
 //Returns the allocation in human readable form
