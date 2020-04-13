@@ -160,3 +160,25 @@ func SingleCrossover(parent1 Chromosome, parent2 Chromosome) Chromosome {
 	//Return the child chromosome
 	return child
 }
+
+//Mutliple crossover two chromosomes
+func MultipleCrossover(parent1 Chromosome, parent2 Chromosome) Chromosome {
+
+	//Randomly select a crossover point
+	crossoverPoint := Random().Intn(len(parent1.FundAllocation) - 1)
+
+	//The child equals the first parent
+	child := parent1
+
+	//Loop through parent 2 allocations
+	for index, value := range parent2.FundAllocation {
+		//If the index is larger than the crossover point
+		if index >= crossoverPoint {
+			//Set the child allocation equal to parent allocation
+			child.FundAllocation[index] = value
+		}
+	}
+
+	//Return the child chromosome
+	return child
+}

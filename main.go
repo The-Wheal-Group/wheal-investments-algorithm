@@ -57,7 +57,7 @@ func main() {
 			//If should mutate
 			if randomNumber < probMutation {
 				//Equal proability of each mutation/crossover type
-				mutationRandom := ga.Random().Intn(3)
+				mutationRandom := ga.Random().Intn(4)
 
 				switch mutationRandom {
 				case 1:
@@ -65,9 +65,10 @@ func main() {
 				case 2:
 					chromosome.MutateSwap()
 				case 3:
-					chromosome = ga.SingleCrossover(chromosome, population.SelectRoulette())
+					chromosome = ga.SingleCrossover(chromosome, elitePopulation.SelectRoulette())
+				case 4:
+					chromosome = ga.MultipleCrossover(chromosome, elitePopulation.SelectRoulette())
 				}
-
 			}
 
 			//If should genenerate entirely new chromosome
