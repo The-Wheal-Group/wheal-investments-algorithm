@@ -1,5 +1,6 @@
 package ga
 
+//The Populatio type
 type Population struct {
 	Chromosomes  []Chromosome
 	TotalFitness float64

@@ -8,7 +8,7 @@ import (
 
 func main() {
 	//The size of the population
-	sizeOfPopulation := 100
+	sizeOfPopulation := 1000
 
 	//The number of generations
 	numGenerations := 1000
@@ -65,7 +65,7 @@ func main() {
 				case 2:
 					chromosome.MutateSwap()
 				case 3:
-					chromosome = ga.Crossover(chromosome, population.SelectRoulette())
+					chromosome = ga.SingleCrossover(chromosome, population.SelectRoulette())
 				}
 
 			}
@@ -90,7 +90,7 @@ func main() {
 			fittestEverChromosome = fittest
 		}
 
-		fmt.Println(fittest.GetAllocationPercentage(), fittest.Fitness, "Generation:", generation)
+		fmt.Println(fittest.GetFundAllocationPercentage(), fittest.Fitness, "Generation:", generation)
 
 		//Set the new population as the population for the next generation
 		population = newPopulation
@@ -99,5 +99,5 @@ func main() {
 	//Get the fittest chromosome of the population
 	fittest := population.Fittest()
 
-	fmt.Println("Answer:", fittest.GetAllocationPercentage())
+	fmt.Println("Answer:", fittest.GetFundAllocationPercentage())
 }

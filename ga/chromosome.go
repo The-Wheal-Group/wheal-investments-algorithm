@@ -2,128 +2,161 @@ package ga
 
 import (
 	"math"
-	"math/rand"
-	"time"
 )
 
-type Allocation [3]float64
+//The FundAllocation type
+type FundAllocation [3]float64
 
+//The Fund Parameters type
+type FundParameters [3]float64
+
+//The FundsTable type
+type FundsTable [3]FundParameters
+
+//The Chromosome type
 type Chromosome struct {
-	Allocation Allocation
-	Fitness    float64
+	FundAllocation FundAllocation
+	Fitness        float64
 }
 
+//Calculate the fitness of a chromosome
 func (chromosome *Chromosome) CalculateFitness() float64 {
-	fund1 := [3]float64{20, 40, 60}
-	fund2 := [3]float64{30, 10, 60}
-	fund3 := [3]float64{60, 20, 20}
-	funds := [3][3]float64{fund1, fund2, fund3}
-	desiredAllocation := [3]float64{30, 10, 60}
+	fund1Parameters := FundParameters{20, 40, 60}
+	fund2Parameters := FundParameters{30, 10, 60}
+	fund3Parameters := FundParameters{60, 20, 20}
+	funds := FundsTable{fund1Parameters, fund2Parameters, fund3Parameters}
+	desiredFundParameters := FundParameters{30, 10, 60}
 
-	var fundsAllocation [3][3]float64
+	//A table used to store the actual allocation values for each fund
+	var allocatedFundsTable FundsTable
 
-	weightedAllocation := chromosome.GetAllocationPercentage()
+	//Get the chromosome percentage fund allocation
+	percentageFundAllocation := chromosome.GetFundAllocationPercentage()
 
-	for regionsIndex := 0; regionsIndex < 3; regionsIndex++ {
-		for fundsIndex := 0; fundsIndex < 3; fundsIndex++ {
-			fundsAllocation[regionsIndex][fundsIndex] = funds[regionsIndex][fundsIndex] * weightedAllocation[regionsIndex]
+	//Loop through all the funds
+	for fundIndex := 0; fundIndex < len(funds); fundIndex++ {
+		//Loop through all the parameters
+		for parameterIndex := 0; parameterIndex < len(desiredFundParameters); parameterIndex++ {
+			//Calculate the actual allocation values for each fund
+			allocatedFundsTable[fundIndex][parameterIndex] = funds[fundIndex][parameterIndex] * percentageFundAllocation[fundIndex]
 		}
 	}
 
-	var actualAllocation [3]float64
+	//Used to store the fund parameters of the actual fund created
+	var actualFundParameters FundParameters
 
-	for regionsIndex := 0; regionsIndex < 3; regionsIndex++ {
-		for fundsIndex := 0; fundsIndex < 3; fundsIndex++ {
-			actualAllocation[regionsIndex] += fundsAllocation[fundsIndex][regionsIndex]
+	//Loop through all the parameters
+	for parameterIndex := 0; parameterIndex < len(desiredFundParameters); parameterIndex++ {
+		//Loop through all the funds
+		for fundIndex := 0; fundIndex < len(funds); fundIndex++ {
+			actualFundParameters[parameterIndex] += allocatedFundsTable[fundIndex][parameterIndex]
 		}
 	}
 
+	//Store the difference between the actual and desired parameters
 	difference := 0.0
 
-	for index := 0; index < 3; index++ {
-		difference += math.Abs(desiredAllocation[index] - actualAllocation[index])
+	//Loop through all the parameters
+	for parameterIndex := 0; parameterIndex < len(desiredFundParameters); parameterIndex++ {
+		//Calculate the difference between the actual and desired parameters and make positivre
+		difference += math.Abs(desiredFundParameters[parameterIndex] - actualFundParameters[parameterIndex])
 	}
 
+	//Avoid a divide by zero bug (i.e. fitness of infinity)
 	if difference == 0 {
 		difference = 0.00000001
 	}
 
+	//Return the fitness (the bigger the better)
 	return 100 / difference
 }
 
+//Get the weighted fund allocation (won't add up to 100% without this function)
+func (chromosome *Chromosome) GetFundAllocationPercentage() FundAllocation {
+	//Create the percentage allocation
+	var percentageAllocation FundAllocation
+
+	//Initialise the total allocation
+	total := 0.0
+
+	//Loop through all the funds and calculate the total allocation
+	for fundIndex := 0; fundIndex < len(chromosome.FundAllocation); fundIndex++ {
+		total += chromosome.FundAllocation[fundIndex]
+	}
+
+	//Loop through all the funds and calculate the weighted allocation (to equal 1)
+	for index := 0; index < len(chromosome.FundAllocation); index++ {
+		percentageAllocation[index] = chromosome.FundAllocation[index] / total
+	}
+
+	//Return the percenntage allocation
+	return percentageAllocation
+}
+
+//Generate a random chromosome
+func GenerateRandomChromosome() Chromosome {
+
+	//The new fund allocation for the chromosome
+	var fundAllocation FundAllocation
+
+	//Loop through all the funds
+	for index := 0; index < len(fundAllocation); index++ {
+		//Give a fund a ranndom allocation
+		fundAllocation[index] = Random().Float64()
+	}
+
+	//Create the new chromosome
+	chromosome := Chromosome{
+		FundAllocation: fundAllocation,
+	}
+
+	//Return the new chromomosome
+	return chromosome
+}
+
+//Mutate the chromosome by incrementing a random value
 func (chromosome *Chromosome) MutateIncrement() {
-	randomSource := rand.NewSource(time.Now().UnixNano())
-	random := rand.New(randomSource)
+	//Select a random fund to mutate
+	fundToMutate := Random().Intn(len(chromosome.FundAllocation) - 1)
 
-	fundToMutate := random.Intn(3)
-	fundToBalance := random.Intn(3)
+	//Select a random fund to balance
+	fundToBalance := Random().Intn(len(chromosome.FundAllocation) - 1)
 
-	plusOrMinus := random.Float64()
-
-	if chromosome.Allocation[fundToMutate] >= 0.01 && chromosome.Allocation[fundToBalance] >= 0.01 &&
-		chromosome.Allocation[fundToMutate] <= 0.99 && chromosome.Allocation[fundToBalance] <= 0.90 {
-		if plusOrMinus < 0.5 {
-			chromosome.Allocation[fundToMutate] += 0.01
-			chromosome.Allocation[fundToBalance] -= 0.01
-		} else {
-			chromosome.Allocation[fundToMutate] -= 0.01
-			chromosome.Allocation[fundToBalance] += 0.01
+	//If the mutation won't cause the fund allocation to go under zero
+	if chromosome.FundAllocation[fundToMutate] >= 0.01 && chromosome.FundAllocation[fundToBalance] >= 0.01 {
+		//If the mutation won't cause the fund allocation to go over one
+		if chromosome.FundAllocation[fundToMutate] <= 0.99 && chromosome.FundAllocation[fundToBalance] <= 0.99 {
+			//Mutate the fund allocations
+			chromosome.FundAllocation[fundToMutate] += 0.01
+			chromosome.FundAllocation[fundToBalance] -= 0.01
 		}
 	}
 }
 
+//Mutate the chromosome by swapping a ranndom value
 func (chromosome *Chromosome) MutateSwap() {
-	randomSource := rand.NewSource(time.Now().UnixNano())
-	random := rand.New(randomSource)
+	//Select a random fund to mutate
+	fundToMutate := Random().Intn(len(chromosome.FundAllocation) - 1)
 
-	fundToMutate := random.Intn(2)
-	fundToSwap := random.Intn(2)
+	//Select a random fund to mutate
+	fundToSwap := Random().Intn(len(chromosome.FundAllocation) - 1)
 
-	temp := chromosome.Allocation[fundToMutate]
-	chromosome.Allocation[fundToMutate] = chromosome.Allocation[fundToSwap]
-	chromosome.Allocation[fundToSwap] = temp
+	//Swap the fund allocations
+	temp := chromosome.FundAllocation[fundToMutate]
+	chromosome.FundAllocation[fundToMutate] = chromosome.FundAllocation[fundToSwap]
+	chromosome.FundAllocation[fundToSwap] = temp
 }
 
-func GenerateRandomChromosome() Chromosome {
-	randomSource := rand.NewSource(time.Now().UnixNano())
-	random := rand.New(randomSource)
+//Single crossover two chromosomes
+func SingleCrossover(parent1 Chromosome, parent2 Chromosome) Chromosome {
 
-	var allocation [3]float64
+	//Randomly select a fund to crossover
+	fundToCrossover := Random().Intn(len(parent1.FundAllocation) - 1)
 
-	for index := 0; index < 3; index++ {
-		allocation[index] = random.Float64()
-	}
+	//Crossover the fund allocation at the random point
+	child := parent1
+	child.FundAllocation[fundToCrossover] = parent2.FundAllocation[fundToCrossover]
 
-	chromosome := Chromosome{
-		Allocation: allocation,
-	}
-
-	return chromosome
-}
-
-func (chromosome *Chromosome) GetAllocationPercentage() Allocation {
-	var allocation Allocation
-
-	total := 0.0
-
-	for index := 0; index < 3; index++ {
-		total += chromosome.Allocation[index]
-	}
-
-	for index := 0; index < 3; index++ {
-		allocation[index] = chromosome.Allocation[index] / total
-	}
-
-	return allocation
-}
-
-func Crossover(parent1 Chromosome, parent2 Chromosome) Chromosome {
-	randomSource := rand.NewSource(time.Now().UnixNano())
-	random := rand.New(randomSource)
-
-	crossoverPoint := random.Intn(2)
-
-	parent1.Allocation[crossoverPoint] = parent2.Allocation[crossoverPoint]
-
-	return parent1
+	//Return the child chromosome
+	return child
 }
