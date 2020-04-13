@@ -6,7 +6,13 @@ type FundParameters [16]float64
 //The FundsTable type
 type FundsTable [11]FundParameters
 
+//The funds type
+type Funds [11]float64
+
+//Get the parameters for all the funds and create a funds table
 func GetFunds() FundsTable {
+	//TODO: Automate this from a database
+
 	return FundsTable{
 		FundParameters{100, 0, 0, 0, 0, 0, 24.4, 14, 12.2, 10.7, 17, 8.9, 3.6, 3.5, 3.1, 2.5},
 		FundParameters{0, 100, 0, 0, 0, 0, 0, 12.9, 17.4, 4.61, 23, 9.55, 13.61, 4.27, 1.08, 10.55},
@@ -22,6 +28,12 @@ func GetFunds() FundsTable {
 	}
 }
 
+//Get the desired fund parameters
 func GetDesiredFundParameters() FundParameters {
 	return FundParameters{30, 15, 10, 10, 10, 25, 20, 13, 0, 0, 0, 0, 3, 6, 2, 0}
+}
+
+//Get the cost of the funds
+func GetCostOfFunds() Funds {
+	return Funds{0.07, 0.07, 0.1, 0.1, 0.2, 0.15, 0.18, 0.15, 0.4, 0.65, 0.15}
 }
