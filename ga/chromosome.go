@@ -2,16 +2,11 @@ package ga
 
 import (
 	"math"
+	"wheal-investments-algorithm/funds"
 )
 
 //The FundAllocation type
 type FundAllocation [3]float64
-
-//The Fund Parameters type
-type FundParameters [3]float64
-
-//The FundsTable type
-type FundsTable [3]FundParameters
 
 //The Chromosome type
 type Chromosome struct {
@@ -21,34 +16,34 @@ type Chromosome struct {
 
 //Calculate the fitness of a chromosome
 func (chromosome *Chromosome) CalculateFitness() float64 {
-	fund1Parameters := FundParameters{20, 40, 60}
-	fund2Parameters := FundParameters{30, 10, 60}
-	fund3Parameters := FundParameters{60, 20, 20}
-	funds := FundsTable{fund1Parameters, fund2Parameters, fund3Parameters}
-	desiredFundParameters := FundParameters{30, 10, 60}
+	//Get the funds table
+	fundsTable := funds.GetFunds()
+
+	//Get the desired fund parameters
+	desiredFundParameters := funds.GetDesiredFundParameters()
 
 	//A table used to store the actual allocation values for each fund
-	var allocatedFundsTable FundsTable
+	var allocatedFundsTable funds.FundsTable
 
 	//Get the chromosome percentage fund allocation
 	percentageFundAllocation := chromosome.GetFundAllocationPercentage()
 
 	//Loop through all the funds
-	for fundIndex := 0; fundIndex < len(funds); fundIndex++ {
+	for fundIndex := 0; fundIndex < len(fundsTable); fundIndex++ {
 		//Loop through all the parameters
 		for parameterIndex := 0; parameterIndex < len(desiredFundParameters); parameterIndex++ {
 			//Calculate the actual allocation values for each fund
-			allocatedFundsTable[fundIndex][parameterIndex] = funds[fundIndex][parameterIndex] * percentageFundAllocation[fundIndex]
+			allocatedFundsTable[fundIndex][parameterIndex] = fundsTable[fundIndex][parameterIndex] * percentageFundAllocation[fundIndex]
 		}
 	}
 
 	//Used to store the fund parameters of the actual fund created
-	var actualFundParameters FundParameters
+	var actualFundParameters funds.FundParameters
 
 	//Loop through all the parameters
 	for parameterIndex := 0; parameterIndex < len(desiredFundParameters); parameterIndex++ {
 		//Loop through all the funds
-		for fundIndex := 0; fundIndex < len(funds); fundIndex++ {
+		for fundIndex := 0; fundIndex < len(fundsTable); fundIndex++ {
 			actualFundParameters[parameterIndex] += allocatedFundsTable[fundIndex][parameterIndex]
 		}
 	}

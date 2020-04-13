@@ -19,6 +19,7 @@ func NewPopulation(size int) Population {
 	//Calculate the total fitness of the new population
 	population.CalculateFitness()
 
+	//Return the new population
 	return population
 }
 
