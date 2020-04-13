@@ -1,72 +1,87 @@
 package ga
 
-import (
-	"math/rand"
-	"time"
-)
-
 type Population struct {
 	Chromosomes  []Chromosome
 	TotalFitness float64
 }
 
+//Create a new population of a given size
 func NewPopulation(size int) Population {
 	var population Population
 
+	//Loop through the new population
 	for index := 0; index < size; index++ {
+		//Generate a new chromosome and add to the population
 		population.Chromosomes = append(population.Chromosomes, GenerateRandomChromosome())
-		population.Chromosomes[index].Fitness = population.Chromosomes[index].CalculateFitness()
 	}
 
-	population.CalculateTotalFitness()
+	//Calculate the total fitness of the new population
+	population.CalculateFitness()
 
 	return population
 }
 
-func (population *Population) CalculateTotalFitness() {
+//Calculate the total fitness of the population
+func (population *Population) CalculateFitness() {
+	//Initialise the population total fitness
 	population.TotalFitness = 0
 
-	for _, chromosome := range population.Chromosomes {
-		population.TotalFitness += chromosome.CalculateFitness()
-	}
-}
-
-func (population *Population) CalculateFitness() {
+	//Loop through the population
 	for index, chromosome := range population.Chromosomes {
-		population.Chromosomes[index].Fitness = chromosome.CalculateFitness()
+		//Calculate the fitness of the chromosome
+		chromosomeFitness := chromosome.CalculateFitness()
+
+		//Set the chromosome fitness
+		population.Chromosomes[index].Fitness = chromosomeFitness
+
+		//Add the individual chromosome fitness to the population total fitness
+		population.TotalFitness += chromosome.Fitness
 	}
 }
 
+//Select a random chromosome from the population based on fitness
 func (population *Population) SelectRoulette() Chromosome {
 
-	randomSource := rand.NewSource(time.Now().UnixNano())
-	random := rand.New(randomSource)
+	//Get a target rank in the population
+	targetRank := Random().Float64() * population.TotalFitness
 
-	targetRank := random.Float64() * population.TotalFitness
+	//Set the currennt rank equal to the target rank
+	currentRank := targetRank
 
-	current := targetRank
-
+	//Loop through the population of chromosomes
 	for _, chromosome := range population.Chromosomes {
-		current -= chromosome.Fitness
+		//Get closer to the target rank
+		currentRank -= chromosome.Fitness
 
-		if current < 0 {
+		//If met the target rank
+		if currentRank < 0 {
 			return chromosome
 		}
 	}
 
+	//If target rank cannot be met, return last chromosome in population
 	return population.Chromosomes[len(population.Chromosomes)-1]
 }
 
+//Get the fittest chromosome
 func (population *Population) Fittest() Chromosome {
-	population.CalculateFitness()
-
+	//Initialise the fittest chromosome
 	fittestChromosome := population.Chromosomes[0]
 
-	for _, value := range population.Chromosomes {
-		if value.Fitness > fittestChromosome.Fitness {
-			fittestChromosome = value
+	//If the fitness of the population hasn't been calculated (should never happen)
+	if fittestChromosome.Fitness == 0.0 {
+		population.CalculateFitness()
+	}
+
+	//Loop through the population
+	for _, chromosome := range population.Chromosomes {
+		//If the chromosome is fitter than the current fittest
+		if chromosome.Fitness > fittestChromosome.Fitness {
+			//Set the fittest chromosome to be this chromosome
+			fittestChromosome = chromosome
 		}
 	}
 
+	//Retrun the fittest chromosome
 	return fittestChromosome
 }
