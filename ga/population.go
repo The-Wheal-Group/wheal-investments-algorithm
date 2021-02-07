@@ -1,6 +1,6 @@
 package ga
 
-//The Population type
+//The Populatio type
 type Population struct {
 	Chromosomes  []Chromosome
 	TotalFitness float64
@@ -29,12 +29,15 @@ func (population *Population) CalculateFitness() {
 	population.TotalFitness = 0
 
 	//Loop through the population
-	for index, _ := range population.Chromosomes {
+	for index, chromosome := range population.Chromosomes {
 		//Calculate the fitness of the chromosome
-		population.Chromosomes[index].CalculateFitness()
+		chromosomeFitness := chromosome.CalculateFitness()
+
+		//Set the chromosome fitness
+		population.Chromosomes[index].Fitness = chromosomeFitness
 
 		//Add the individual chromosome fitness to the population total fitness
-		population.TotalFitness += population.Chromosomes[index].Fitness
+		population.TotalFitness += chromosome.Fitness
 	}
 }
 
@@ -63,7 +66,7 @@ func (population *Population) SelectRoulette() Chromosome {
 }
 
 //Get the fittest chromosome
-func (population *Population) Fittest(maxCost float64) Chromosome {
+func (population *Population) Fittest() Chromosome {
 	//Initialise the fittest chromosome
 	fittestChromosome := population.Chromosomes[0]
 
@@ -75,7 +78,7 @@ func (population *Population) Fittest(maxCost float64) Chromosome {
 	//Loop through the population
 	for _, chromosome := range population.Chromosomes {
 		//If the chromosome is fitter than the current fittest
-		if chromosome.Fitness > fittestChromosome.Fitness && chromosome.Cost < maxCost {
+		if chromosome.Fitness > fittestChromosome.Fitness {
 			//Set the fittest chromosome to be this chromosome
 			fittestChromosome = chromosome
 		}

@@ -3,6 +3,7 @@ package main
 import (
 	"fmt"
 	"sort"
+	"wheal-investments-algorithm/funds"
 	"wheal-investments-algorithm/ga"
 )
 
@@ -14,22 +15,19 @@ func main() {
 	numGenerations := 1000
 
 	//The number of eliete members of the population
-	numElietes := 350
+	numElietes := 50
 
 	//The proability of mutation or crossover
-	probMutation := 0.7
+	probMutation := 0.5
 
 	//The probabilitty of completely new member of population
-	probNewChromosome := 0.2
-
-	//The maximum cost of the chromosome
-	maxCost := 0.2
+	probNewChromosome := 0.05
 
 	//Create a new population of the desired size
 	population := ga.NewPopulation(sizeOfPopulation)
 
 	//Store the inital fittest ever chromosome
-	fittestEverChromosome := population.Fittest(1.0)
+	fittestEverChromosome := population.Fittest()
 
 	//Main generation loop
 	for generation := 0; generation < numGenerations; generation++ {
@@ -60,7 +58,7 @@ func main() {
 			//If should mutate
 			if randomNumber < probMutation {
 				//Equal proability of each mutation/crossover type
-				mutationRandom := ga.Random().Intn(6)
+				mutationRandom := ga.Random().Intn(4)
 
 				switch mutationRandom {
 				case 1:
@@ -71,10 +69,6 @@ func main() {
 					chromosome = ga.SingleCrossover(chromosome, elitePopulation.SelectRoulette())
 				case 4:
 					chromosome = ga.MultipleCrossover(chromosome, elitePopulation.SelectRoulette())
-				case 5:
-					chromosome.MutateZero()
-				case 6:
-					chromosome.MutateOne()
 				}
 			}
 
@@ -87,42 +81,37 @@ func main() {
 			newPopulation.Chromosomes = append(newPopulation.Chromosomes, chromosome)
 		}
 
-		//Add the finest ever chromosome to the population
-		newPopulation.Chromosomes = append(newPopulation.Chromosomes, fittestEverChromosome)
-
 		//Calculate the total fitness of the new population
 		newPopulation.CalculateFitness()
 
 		//Get the fittest chromosome of the new population
-		fittest := newPopulation.Fittest(maxCost)
+		fittest := newPopulation.Fittest()
 
 		//If the fittest ever chromosome
-		if fittest.Fitness > fittestEverChromosome.Fitness && fittest.Cost < maxCost {
+		if fittest.Fitness > fittestEverChromosome.Fitness {
 			fittestEverChromosome = fittest
 		}
 
 		//Print the fittest chromosome to the screen
 		generationText := fmt.Sprintf("Gen %04d:", generation)
-		fmt.Println(generationText, parametersText(fittestEverChromosome), "Fitness:", newPopulation.TotalFitness)
+		fmt.Println(generationText, parametersText(fittest.GetActualFundParameters()), fittest.Fitness)
 
 		//Set the new population as the population for the next generation
 		population = newPopulation
 	}
 
 	//Get the fittest chromosome of the population
-	fittest := population.Fittest(maxCost)
+	fittest := population.Fittest()
 
 	fmt.Println("Answer:", allocationText(fittest.GetFundAllocationPercentage()))
 }
 
 //Returns the actual fund parameters in human readable form
-func parametersText(chromosome ga.Chromosome) string {
-	chromosome.CalculateCostOfChromosome()
+func parametersText(fundParameters funds.FundParameters) string {
 	var parametersText string
-	for _, value := range chromosome.GetActualFundParameters() {
+	for _, value := range fundParameters {
 		parametersText += fmt.Sprintf("%.2f ", value)
 	}
-	parametersText += fmt.Sprintf("Cost: %.6f", chromosome.Cost)
 	return parametersText
 }
 

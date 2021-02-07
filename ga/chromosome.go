@@ -12,11 +12,10 @@ type FundAllocation [11]float64
 type Chromosome struct {
 	FundAllocation FundAllocation
 	Fitness        float64
-	Cost           float64
 }
 
 //Calculate the fitness of a chromosome
-func (chromosome *Chromosome) CalculateFitness() {
+func (chromosome *Chromosome) CalculateFitness() float64 {
 	//Get the desired fund parameters
 	desiredFundParameters := funds.GetDesiredFundParameters()
 
@@ -40,25 +39,8 @@ func (chromosome *Chromosome) CalculateFitness() {
 		difference = 0.00000001
 	}
 
-	//Calculate the cost of the chromosome
-	chromosome.CalculateCostOfChromosome()
-
-	chromosome.Fitness = (1000 / (difference)) * (1 - chromosome.Cost)
-}
-
-//Calculate the cost of the chromosome
-func (chromosome *Chromosome) CalculateCostOfChromosome() {
-	//Initialise the chromosome cost at zero
-	chromosome.Cost = 0
-
-	//Get the cost of all the funds
-	fundsCost := funds.GetCostOfFunds()
-
-	//Loop through all the funds
-	for index, value := range chromosome.GetFundAllocationPercentage() {
-		//Calculate the cost of the fund
-		chromosome.Cost += value * fundsCost[index]
-	}
+	//Return the fitness (the bigger the better)
+	return 1000000 / difference
 }
 
 //Get the actual fund parameters
@@ -158,22 +140,6 @@ func (chromosome *Chromosome) MutateIncrement() {
 			chromosome.FundAllocation[fundToBalance] -= 0.01
 		}
 	}
-}
-
-//Mutate the chromosome by making a fund zero
-func (chromosome *Chromosome) MutateZero() {
-	//Select a random fund to mutate
-	fundToMutate := Random().Intn(len(chromosome.FundAllocation) - 1)
-
-	chromosome.FundAllocation[fundToMutate] = 0.0
-}
-
-//Mutate the chromosome by making a fund 1
-func (chromosome *Chromosome) MutateOne() {
-	//Select a random fund to mutate
-	fundToMutate := Random().Intn(len(chromosome.FundAllocation) - 1)
-
-	chromosome.FundAllocation[fundToMutate] = 1.0
 }
 
 //Mutate the chromosome by swapping a ranndom value
